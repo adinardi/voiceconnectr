@@ -1,9 +1,11 @@
 goog.require('goog.events');
+goog.require('goog.dom.classes');
 
 goog.provide('thetr.connectr.ui.sms.Main');
 
 thetr.connectr.ui.sms.Main = function() {
     this.baseElem = goog.dom.createDom('div');
+    goog.dom.classes.add(this.baseElem, 'scrollable-content');
     goog.events.listen(thetr.connectr.Base.DATA_LOADER, 'smsupdate', this.updateUI, undefined, this);
 };
 
