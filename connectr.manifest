@@ -1,0 +1,11 @@
+CACHE MANIFEST
+# version 4
+
+deps.js
+compiled.js
+
+NETWORK:
+http://thetr.net/~angelo/vc/
+http://www.thetr.net/~angelo/vc/
+https://thetr.net/~angelo/vc/
+https://www.thetr.net/~angelo/vc/
