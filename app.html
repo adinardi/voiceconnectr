@@ -14,12 +14,17 @@
     <script src="connectr.js" type="text/javascript" charset="utf-8"></script> -->
     <script src="compiled.js" type="text/javascript" charset="utf-8"></script>
     
+    <!-- <link rel="stylesheet" href="closure-library-read-only/closure/goog/demos/css/dialog.css" type="text/css" media="screen" title="no title" charset="utf-8"> -->
     <style type="text/css" media="screen">
+    
         body {
             margin: 0;
             padding: 0;
             font-family: verdana;
             font-size: .8em;
+        }
+        .back-btn {
+            background-color: navy;
         }
         .scrollable-content {
             padding-bottom: 100px;
@@ -54,6 +59,28 @@
         .sms-to-me {
             margin-right: 20px;
             background-color: #ccc;
+        }
+        .sms-entry-box {
+            height: 100%;
+            width: 100%;
+            background-color: gray;
+            opacity: .5;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .sms-entry-no-opacity {
+            opacity: 1;
+        }
+        .sms-send-btn {
+            width: 100%;
+            background-color: green;
+            -webkit-border-radius: 20px;
+        }
+        .sms-reply-btn {
+            -webkit-border-radius: 20px;
+            width: 100%;
+            background-color: blue;
         }
     </style>
 </head>

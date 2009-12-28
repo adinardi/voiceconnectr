@@ -1,8 +1,9 @@
 CACHE MANIFEST
-# version 18
+# version 35
 
 deps.js
 compiled.js
+#closure-library-read-only/closure/goog/demos/css/dialog.css
 
 NETWORK:
 http://thetr.net/~angelo/vc/

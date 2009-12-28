@@ -39,10 +39,11 @@ class gvClient {
     
     private function getRNRToken() {
         if (strlen($this->rnr) < 1) {
-            $session = getCurlGet($gvBaseURL . '?' . $this->getAuthGetParam());
+            $session = $this->getCurlGet($this->gvBaseURL . '?' . $this->getAuthGetParam());
             $result = curl_exec($session);
-        
+            // echo $result;
             preg_match("/'_rnr_se'\: '([^']+)'/", $result,$rnr);
+            // print_r($rnr);  
             $this->rnr = $rnr[1];
         }
         
@@ -158,15 +159,17 @@ class gvClient {
     }
     
     public function sendSMS($number, $text) {
+        $number = str_replace("+", "", $number);
         $params = array(
             'id' => '',
             'phoneNumber' => $number,
-            'text' => $text,
+            'text' => stripslashes($text),
             '_rnr_se' => $this->getRNRToken()
             );
-        $session = $this->getCurlPost($this->gvBaseURL . 'sms/send/?' + $this->getAuthGetParam(), $params);
+        print_r($params);
+        $session = $this->getCurlPost($this->gvBaseURL . 'sms/send/?' . $this->getAuthGetParam(), $params);
         $result = $this->getCurlResult($session);
-        
+        echo $result;
         return $result;
     }
 }

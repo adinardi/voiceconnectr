@@ -2,7 +2,10 @@
 
 require_once "gvClient.php";
 
-$requestParam = $_POST['data'] || $_GET['data'];
+$requestParam = $_POST['data'];
+if (!$requestParam) {
+    $requestParam = $_GET['data'];
+}
 
 $client = new gvClient();
 $client->login("adinardi@gmail.com", "<PASSWORD>");

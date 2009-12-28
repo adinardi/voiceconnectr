@@ -40,6 +40,10 @@ thetr.connectr.Base.prototype.init = function() {
     
     this.smsUI = new thetr.connectr.ui.sms.Main();
     goog.dom.appendChild(this.mainElem, this.smsUI.getRootNode());
+    
+    setTimeout(function() {
+        thetr.connectr.Base.DATA_LOADER.updateRecentSMS();
+    }, 100);
 };
 
 thetr.connectr.Base.prototype.handleRefreshBtnClick = function(e) {
