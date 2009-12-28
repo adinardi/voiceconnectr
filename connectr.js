@@ -29,7 +29,7 @@ thetr.connectr.Base.prototype.init = function() {
 
     var refreshBtn = goog.dom.createDom('div');
     goog.style.setSize(refreshBtn, 100, 20);
-    goog.dom.setTextContent(refreshBtn, 'Refresh 3');
+    goog.dom.setTextContent(refreshBtn, 'Refresh');
     refreshBtn.style.backgroundColor = 'green';
     goog.events.listen(refreshBtn, 'click', this.handleRefreshBtnClick, undefined, this);
     

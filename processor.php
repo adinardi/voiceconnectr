@@ -9,4 +9,6 @@ $client->login("adinardi@gmail.com", "<PASSWORD>");
 
 if ($requestParam == 'recentSMS') {
     echo $client->getRecentSMS();
+} else if ($requestParam == 'sendSMS') {
+    $client->sendSMS($_POST['number'], $_POST['text']);
 }

@@ -12167,26 +12167,35 @@ thetr.connectr.ui.sms.Main.prototype.updateUI = function(e) {
     var conversations = e.data.messages;
     var smsElem = goog.dom.createDom('div');
     for (var conversationID in conversations) {
-        var convoElem = goog.dom.createDom('div');
-        convoElem.style.marginBottom = '5px';
-        convoElem.style.border = '1px solid blue';
+        var convoElem = goog.dom.createDom('div', 'sms-conversation');
+        
+        var contactNameElem = goog.dom.createDom('div', 'sms-conversation-contact');
+        goog.dom.setTextContent(contactNameElem, conversations[conversationID].contactName);
+        goog.dom.appendChild(convoElem, contactNameElem);
         
         for (var messageNum in conversations[conversationID].messages) {
             var msg = conversations[conversationID].messages[messageNum];
 
             var msgContainer = goog.dom.createDom('div');
-            var textContainer = goog.dom.createDom('span');
+            
+            // var fromContainer = goog.dom.createDom('span', 'sms-from');
+            // goog.dom.setTextContent(fromContainer, msg.from);
+            
+            var timeContainer = goog.dom.createDom('span', 'sms-time');
+            goog.dom.setTextContent(timeContainer, msg.time);
+
+            var className = 'sms-text';
+            if (msg.from == 'Me:') {
+                className += ' sms-from-me';
+            } else {
+                className += ' sms-to-me';
+            }
+            var textContainer = goog.dom.createDom('div', className);
             goog.dom.setTextContent(textContainer, msg.text);
             
-            var fromContainer = goog.dom.createDom('span');
-            goog.dom.setTextContent(fromContainer, msg.from);
-            
-            var timeContainer = goog.dom.createDom('span');
-            goog.dom.setTextContent(timeContainer, msg.time);
-            
-            goog.dom.appendChild(msgContainer, fromContainer);
-            goog.dom.appendChild(msgContainer, textContainer);
+            // goog.dom.appendChild(msgContainer, fromContainer);
             goog.dom.appendChild(msgContainer, timeContainer);
+            goog.dom.appendChild(msgContainer, textContainer);
             goog.dom.appendChild(convoElem, msgContainer);
         }
         goog.dom.appendChild(smsElem, convoElem);
@@ -17514,7 +17523,7 @@ thetr.connectr.Base.prototype.init = function() {
 
     var refreshBtn = goog.dom.createDom('div');
     goog.style.setSize(refreshBtn, 100, 20);
-    goog.dom.setTextContent(refreshBtn, 'Refresh 3');
+    goog.dom.setTextContent(refreshBtn, 'Refresh');
     refreshBtn.style.backgroundColor = 'green';
     goog.events.listen(refreshBtn, 'click', this.handleRefreshBtnClick, undefined, this);
     

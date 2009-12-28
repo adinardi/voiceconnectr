@@ -25,6 +25,10 @@ class gvClient {
         return $session;
     }
     
+    private function getCurlResult($session) {
+        return curl_exec($session);
+    }
+    
     private function getBaseParams() {
         return array('auth' => $this->authToken);
     }
@@ -77,7 +81,7 @@ class gvClient {
         $returnJSON = array();
         $returnJSON['SMS'] = array();
         
-        $params = $this->getBaseParams();
+        // $params = $this->getBaseParams();
         $session = $this->getCurlGet($this->gvBaseURL . 'inbox/recent/sms?auth=' . $this->authToken);
         $result = curl_exec($session);
         // echo $result;
@@ -119,6 +123,11 @@ class gvClient {
                     // echo $entry->textContent . '<br>';
                     // echo $conversation->textContent;
                     $conversationID = $conversation->attributes->getNamedItem('id')->value;
+                    $contactInfo = $xpath->query('div//a[contains(@class, "gc-message-name-link")]', $conversation);
+                    $contactName = $contactInfo->item(0)->textContent;
+                    
+                    $returnJSON['SMS']['data']['messages'][$conversationID]['contactName'] = $contactName;
+                    
                     $messages = $xpath->query('div//div[contains(@class, "gc-message-sms-row")]', $conversation);
                     for ($miter = 0; $miter < $messages->length; $miter++) {// ($messages as $message) {
                         $message = $messages->item($miter);
@@ -146,5 +155,18 @@ class gvClient {
         }
         
         return json_encode($returnJSON);
+    }
+    
+    public function sendSMS($number, $text) {
+        $params = array(
+            'id' => '',
+            'phoneNumber' => $number,
+            'text' => $text,
+            '_rnr_se' => $this->getRNRToken()
+            );
+        $session = $this->getCurlPost($this->gvBaseURL . 'sms/send/?' + $this->getAuthGetParam(), $params);
+        $result = $this->getCurlResult($session);
+        
+        return $result;
     }
 }
