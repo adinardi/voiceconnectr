@@ -16,24 +16,68 @@ thetr.connectr.ui.sms.Main.prototype.getRootNode = function() {
 };
 
 thetr.connectr.ui.sms.Main.prototype.handleDataRefresh = function(e) {
-    this.dataCache = e.data.messages;
+    // this.dataCache = e.data.messages;
+    this.dataCache = e.data.messagesByNumber;
     
     this.updateUI();
 };
 
 thetr.connectr.ui.sms.Main.prototype.updateUI = function() {
-    // console.log(e);
-    var conversations = this.dataCache;
+    var messagesByNumber = this.dataCache;
+
+    var smsListElem = goog.dom.createDom('div');    
+    for (var number in messagesByNumber) {
+        var meta = messagesByNumber[number]['meta'];
+
+        var nameElem = goog.dom.createDom('div', 'sms-contact-list-item');
+        goog.dom.setTextContent(nameElem, meta.contactName);
+        goog.dom.appendChild(smsListElem, nameElem);
+        nameElem.phoneNumber = number;
+        goog.events.listen(nameElem, 'click', this.handleContactClick, undefined, this);
+    }
+    
+    this.baseController.showRefreshButton(true);
+    goog.dom.removeChildren(this.baseElem);
+    goog.dom.appendChild(this.baseElem, smsListElem);
+    window.scrollTo(0,1);
+};
+
+thetr.connectr.ui.sms.Main.prototype.handleContactClick = function(e) {
+    this.renderConversationUI(e.target.phoneNumber);
+};
+
+thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
+    var messagesByNumber = this.dataCache;
+    
+    var conversation = messagesByNumber[number]['messages'];
+    var meta = messagesByNumber[number]['meta'];
+    
     var smsElem = goog.dom.createDom('div');
-    for (var conversationID in conversations) {
+    
+    var backElem = goog.dom.createDom('div');
+    goog.dom.setTextContent(backElem, '< Back');
+    goog.dom.appendChild(smsElem, backElem);
+    goog.events.listen(backElem, 'click', this.handleBackFromContactClick, undefined, this);
+    
+    // for (var conversationID in conversations) {
         var convoElem = goog.dom.createDom('div', 'sms-conversation');
         
         var contactNameElem = goog.dom.createDom('div', 'sms-conversation-contact');
-        goog.dom.setTextContent(contactNameElem, conversations[conversationID].contactName);
+        goog.dom.setTextContent(contactNameElem, meta.contactName);
         goog.dom.appendChild(convoElem, contactNameElem);
         
-        for (var messageNum in conversations[conversationID].messages) {
-            var msg = conversations[conversationID].messages[messageNum];
+        var fakeEntryElem = goog.dom.createDom('div', 'sms-reply-btn');
+        fakeEntryElem.phoneNumber = number;
+        fakeEntryElem.contactName = meta.contactName;
+        goog.dom.setTextContent(fakeEntryElem, 'Reply');
+        goog.events.listen(fakeEntryElem, 'click', this.handleEntryTouch, undefined, this);
+        
+        var fakeEntryContainerElem = goog.dom.createDom('div');
+        goog.dom.appendChild(fakeEntryContainerElem, fakeEntryElem);
+        goog.dom.appendChild(convoElem, fakeEntryContainerElem);
+        
+        for (var miter = conversation.length - 1; miter >= 0; miter--) {
+            var msg = conversation[miter];
 
             var msgContainer = goog.dom.createDom('div');
             
@@ -58,58 +102,42 @@ thetr.connectr.ui.sms.Main.prototype.updateUI = function() {
             goog.dom.appendChild(convoElem, msgContainer);
         }
         
-        var fakeEntryElem = goog.dom.createDom('div', 'sms-reply-btn');
-        fakeEntryElem.phoneNumber = conversations[conversationID].phoneNumber;
-        goog.dom.setTextContent(fakeEntryElem, 'Reply');
-        goog.events.listen(fakeEntryElem, 'click', this.handleEntryTouch, undefined, this);
-        
-        var fakeEntryContainerElem = goog.dom.createDom('div');
-        goog.dom.appendChild(fakeEntryContainerElem, fakeEntryElem);
-        goog.dom.appendChild(convoElem, fakeEntryContainerElem);
+
         
         goog.dom.appendChild(smsElem, convoElem);
-    }
+    // }
     
-    this.baseController.showRefreshButton(true);
+    this.baseController.showRefreshButton(false);
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, smsElem);
     window.scrollTo(0,1);
 };
 
+thetr.connectr.ui.sms.Main.prototype.handleBackFromContactClick = function(e) {
+    this.updateUI();
+};
+
 thetr.connectr.ui.sms.Main.prototype.handleEntryTouch = function(e) {
-    // alert('sms to ' + e.target.phoneNumber);
-    this.showSMSEntry(e.target.phoneNumber);
+    this.showSMSEntry(e.target.phoneNumber, e.target.contactName);
     
     return false;
 };
 
-thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber) {
+thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber, contactName) {
     var entryElem = goog.dom.createDom('div');
-    //     var removeOpacity = goog.dom.createDom('div', 'sms-entry-no-opacity');
-    //     var inputElem = goog.dom.createDom('textarea');
-    //     var sendElem = goog.dom.createDom('div', 'sms-send-btn');
-    //     goog.dom.setTextContent(sendElem, 'Send Message');
-    //     
-    //     goog.dom.appendChild(entryElem, removeOpacity);
-    //     goog.dom.appendChild(removeOpacity, inputElem);
-    //     goog.dom.appendChild(removeOpacity, sendElem);
-    //     
-    //     goog.dom.appendChild(document.body, entryElem);
-    //     inputElem.focus();
-    // var d = new goog.ui.Dialog();
-    // d.setTitle('Send SMS');
-    // d.setModal(true);
-    // var ce = d.getContentElement();
-    // 
     
     var backBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');
     var backBtn = goog.dom.createDom('span', 'back-btn');
+    backBtn.phoneNumber = phoneNumber;
     goog.events.listen(backBtn, 'click', this.handleBackFromEntry, undefined, this);
     goog.dom.setTextContent(backBtn, '< Back');
     
     goog.dom.appendChild(backBtnWrapper, backBtn);
     
-    var inputElem = goog.dom.createDom('textarea', {'rows': '10', 'cols': '40'});
+    var numberElem = goog.dom.createDom('div', 'sms-phone-number');
+    goog.dom.setTextContent(numberElem, contactName + ' (' + phoneNumber + ')');
+    
+    var inputElem = goog.dom.createDom('textarea', {'rows': '9', 'cols': '40'});
     var sendBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');
     var sendElem = goog.dom.createDom('span', 'sms-send-btn');
     sendElem.phoneNumber = phoneNumber;
@@ -119,6 +147,7 @@ thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber) {
     goog.dom.appendChild(sendBtnWrapper, sendElem);
     // 
     goog.dom.appendChild(entryElem, backBtnWrapper);
+    goog.dom.appendChild(entryElem, numberElem);
     goog.dom.appendChild(entryElem, inputElem);
     goog.dom.appendChild(entryElem, sendBtnWrapper);
     // 
@@ -147,6 +176,6 @@ thetr.connectr.ui.sms.Main.prototype.handleSMSSent = function(e) {
 };
 
 thetr.connectr.ui.sms.Main.prototype.handleBackFromEntry = function(e) {
-    this.updateUI();
+    this.renderConversationUI(e.target.phoneNumber);
 };
 
