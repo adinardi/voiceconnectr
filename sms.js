@@ -3,9 +3,9 @@ goog.require('goog.dom.classes');
 
 goog.provide('thetr.connectr.ui.sms.Main');
 
-thetr.connectr.ui.sms.Main = function() {
+thetr.connectr.ui.sms.Main = function(baseController) {
     this.dataCache = null;
-    
+    this.baseController = baseController;
     this.baseElem = goog.dom.createDom('div');
     goog.dom.classes.add(this.baseElem, 'scrollable-content');
     goog.events.listen(thetr.connectr.Base.DATA_LOADER, 'smsupdate', this.handleDataRefresh, undefined, this);
@@ -70,6 +70,7 @@ thetr.connectr.ui.sms.Main.prototype.updateUI = function() {
         goog.dom.appendChild(smsElem, convoElem);
     }
     
+    this.baseController.showRefreshButton(true);
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, smsElem);
     window.scrollTo(0,1);
@@ -101,23 +102,29 @@ thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber) {
     // var ce = d.getContentElement();
     // 
     
-    var backBtn = goog.dom.createDom('div', 'back-btn');
+    var backBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');
+    var backBtn = goog.dom.createDom('span', 'back-btn');
     goog.events.listen(backBtn, 'click', this.handleBackFromEntry, undefined, this);
     goog.dom.setTextContent(backBtn, '< Back');
     
-    var inputElem = goog.dom.createDom('textarea');
-    var sendElem = goog.dom.createDom('div', 'sms-send-btn');
+    goog.dom.appendChild(backBtnWrapper, backBtn);
+    
+    var inputElem = goog.dom.createDom('textarea', {'rows': '10', 'cols': '40'});
+    var sendBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');
+    var sendElem = goog.dom.createDom('span', 'sms-send-btn');
     sendElem.phoneNumber = phoneNumber;
     goog.events.listen(sendElem, 'click', this.handleSendSMSClick, undefined, this);
     this.smsInputElem = inputElem;
     goog.dom.setTextContent(sendElem, 'Send Message');
+    goog.dom.appendChild(sendBtnWrapper, sendElem);
     // 
-    goog.dom.appendChild(entryElem, backBtn);
+    goog.dom.appendChild(entryElem, backBtnWrapper);
     goog.dom.appendChild(entryElem, inputElem);
-    goog.dom.appendChild(entryElem, sendElem);
+    goog.dom.appendChild(entryElem, sendBtnWrapper);
     // 
     // d.setVisible(true);
     
+    this.baseController.showRefreshButton(false);
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, entryElem);
     inputElem.focus();

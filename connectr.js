@@ -28,6 +28,7 @@ thetr.connectr.Base.prototype.init = function() {
     window.scrollTo(0,1);
 
     var refreshBtn = goog.dom.createDom('div');
+    this.refreshButton = refreshBtn;
     goog.style.setSize(refreshBtn, 100, 20);
     goog.dom.setTextContent(refreshBtn, 'Refresh');
     refreshBtn.style.backgroundColor = 'green';
@@ -38,12 +39,16 @@ thetr.connectr.Base.prototype.init = function() {
     
     thetr.connectr.Base.DATA_LOADER = new thetr.connectr.dataLoader();
     
-    this.smsUI = new thetr.connectr.ui.sms.Main();
+    this.smsUI = new thetr.connectr.ui.sms.Main(this);
     goog.dom.appendChild(this.mainElem, this.smsUI.getRootNode());
     
     setTimeout(function() {
         thetr.connectr.Base.DATA_LOADER.updateRecentSMS();
     }, 100);
+};
+
+thetr.connectr.Base.prototype.showRefreshButton = function(show) {
+    goog.style.showElement(this.refreshButton, show);
 };
 
 thetr.connectr.Base.prototype.handleRefreshBtnClick = function(e) {
