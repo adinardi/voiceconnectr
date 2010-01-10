@@ -12203,11 +12203,6 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
     
     var smsElem = goog.dom.createDom('div');
     
-    var backElem = goog.dom.createDom('div');
-    goog.dom.setTextContent(backElem, '< Back');
-    goog.dom.appendChild(smsElem, backElem);
-    goog.events.listen(backElem, 'click', this.handleBackFromContactClick, undefined, this);
-    
     // for (var conversationID in conversations) {
         var convoElem = goog.dom.createDom('div', 'sms-conversation');
         
@@ -12239,6 +12234,8 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
             var className = 'sms-text';
             if (msg.from == 'Me:') {
                 className += ' sms-from-me';
+            } else if (msg.from == 'TIME_CHANGE') {
+                className += ' sms-time-change';
             } else {
                 className += ' sms-to-me';
             }
@@ -12256,7 +12253,13 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
         goog.dom.appendChild(smsElem, convoElem);
     // }
     
-    this.baseController.showRefreshButton(false);
+    var backElem = goog.dom.createDom('div');
+    goog.dom.setTextContent(backElem, '< Back');
+    // goog.dom.appendChild(smsElem, backElem);
+    this.baseController.setTopBar(backElem);
+    goog.events.listen(backElem, 'click', this.handleBackFromContactClick, undefined, this);
+    
+    // this.baseController.showRefreshButton(false);
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, smsElem);
     window.scrollTo(0,1);
@@ -12284,7 +12287,8 @@ thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber, contac
     goog.dom.appendChild(backBtnWrapper, backBtn);
     
     var numberElem = goog.dom.createDom('div', 'sms-phone-number');
-    goog.dom.setTextContent(numberElem, contactName + ' (' + phoneNumber + ')');
+    var displayNumber = this.dataCache[phoneNumber].meta.displayNumber;
+    goog.dom.setTextContent(numberElem, contactName + ' [' + displayNumber + ']');
     
     var inputElem = goog.dom.createDom('textarea', {'rows': '9', 'cols': '40'});
     var sendBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');
@@ -17639,11 +17643,11 @@ thetr.connectr.Base.DATA_LOADER = null;
 
 thetr.connectr.Base.prototype.init = function() {
     this.mainElem = goog.dom.createDom('div');
-    goog.style.setSize(this.mainElem, 320, 480);
-    this.mainElem.style.overflow = 'hidden';
+    goog.style.setSize(this.mainElem, 320, 15);
+    // this.mainElem.style.overflow = 'hidden';
         
-    goog.events.listen(this.mainElem, 'touchstart', this.handleTouchStart, undefined, this);
-    goog.events.listen(this.mainElem, 'touchmove', this.handleTouchMove, undefined, this);
+    goog.events.listen(document.body, 'touchstart', this.handleTouchStart, undefined, this);
+    goog.events.listen(document.body, 'touchmove', this.handleTouchMove, undefined, this);
     window.scrollTo(0,1);
 
     var refreshBtn = goog.dom.createDom('div');
@@ -17656,10 +17660,16 @@ thetr.connectr.Base.prototype.init = function() {
     goog.dom.appendChild(this.mainElem, refreshBtn);
     goog.dom.appendChild(document.body, this.mainElem);
     
+    this.contentElem = goog.dom.createDom('div');
+    goog.style.setSize(this.contentElem, 320, 465);
+    this.contentElem.style.overflow = 'hidden';
+    
+    goog.dom.appendChild(document.body, this.contentElem);
+    
     thetr.connectr.Base.DATA_LOADER = new thetr.connectr.dataLoader();
     
     this.smsUI = new thetr.connectr.ui.sms.Main(this);
-    goog.dom.appendChild(this.mainElem, this.smsUI.getRootNode());
+    goog.dom.appendChild(this.contentElem, this.smsUI.getRootNode());
     
     setTimeout(function() {
         thetr.connectr.Base.DATA_LOADER.updateRecentSMS();
@@ -17667,7 +17677,18 @@ thetr.connectr.Base.prototype.init = function() {
 };
 
 thetr.connectr.Base.prototype.showRefreshButton = function(show) {
-    goog.style.showElement(this.refreshButton, show);
+    // goog.style.showElement(this.refreshButton, show);
+    if (show) {
+        goog.dom.removeChildren(this.mainElem);
+        goog.dom.appendChild(this.mainElem, this.refreshButton);
+    } else {
+        goog.dom.removeChildren(this.mainElem);
+    }
+};
+
+thetr.connectr.Base.prototype.setTopBar = function(content) {
+    this.showRefreshButton(false);
+    goog.dom.appendChild(this.mainElem, content);
 };
 
 thetr.connectr.Base.prototype.handleRefreshBtnClick = function(e) {
@@ -17681,6 +17702,6 @@ thetr.connectr.Base.prototype.handleTouchStart = function(e) {
 thetr.connectr.Base.prototype.handleTouchMove = function(e) {
     e.preventDefault();
     var curY = e.getBrowserEvent().targetTouches[0].pageY;
-    this.mainElem.scrollTop = this.mainElem.scrollTop - (curY - this.touchStartY);
+    this.contentElem.scrollTop = this.contentElem.scrollTop - (curY - this.touchStartY);
     this.touchStartY = curY;
 };

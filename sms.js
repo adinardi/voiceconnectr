@@ -54,11 +54,6 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
     
     var smsElem = goog.dom.createDom('div');
     
-    var backElem = goog.dom.createDom('div');
-    goog.dom.setTextContent(backElem, '< Back');
-    goog.dom.appendChild(smsElem, backElem);
-    goog.events.listen(backElem, 'click', this.handleBackFromContactClick, undefined, this);
-    
     // for (var conversationID in conversations) {
         var convoElem = goog.dom.createDom('div', 'sms-conversation');
         
@@ -90,6 +85,8 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
             var className = 'sms-text';
             if (msg.from == 'Me:') {
                 className += ' sms-from-me';
+            } else if (msg.from == 'TIME_CHANGE') {
+                className += ' sms-time-change';
             } else {
                 className += ' sms-to-me';
             }
@@ -107,7 +104,13 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
         goog.dom.appendChild(smsElem, convoElem);
     // }
     
-    this.baseController.showRefreshButton(false);
+    var backElem = goog.dom.createDom('div');
+    goog.dom.setTextContent(backElem, '< Back');
+    // goog.dom.appendChild(smsElem, backElem);
+    this.baseController.setTopBar(backElem);
+    goog.events.listen(backElem, 'click', this.handleBackFromContactClick, undefined, this);
+    
+    // this.baseController.showRefreshButton(false);
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, smsElem);
     window.scrollTo(0,1);
@@ -135,7 +138,8 @@ thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber, contac
     goog.dom.appendChild(backBtnWrapper, backBtn);
     
     var numberElem = goog.dom.createDom('div', 'sms-phone-number');
-    goog.dom.setTextContent(numberElem, contactName + ' (' + phoneNumber + ')');
+    var displayNumber = this.dataCache[phoneNumber].meta.displayNumber;
+    goog.dom.setTextContent(numberElem, contactName + ' [' + displayNumber + ']');
     
     var inputElem = goog.dom.createDom('textarea', {'rows': '9', 'cols': '40'});
     var sendBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');

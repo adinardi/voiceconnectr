@@ -135,10 +135,18 @@ class gvClient {
                     if (!$returnJSON['SMS']['data']['messagesByNumber'][$contactNumber]) {
                         $returnJSON['SMS']['data']['messagesByNumber'][$contactNumber] = array();
                         $returnJSON['SMS']['data']['messagesByNumber'][$contactNumber]['meta'] = array(
-                            'contactName' => $contactName
+                            'contactName' => $contactName,
+                            'displayNumber' => $returnJSON['SMS']['data']['messages'][$conversationID]['displayNumber']
                             );
                         $returnJSON['SMS']['data']['messagesByNumber'][$contactNumber]['messages'] = array();
                     }
+                    
+                    $msgJSON = array(
+                        'from' => 'TIME_CHANGE',
+                        'text' => $returnJSON['SMS']['data']['messages'][$conversationID]['displayStartDateTime'],
+                        'time' => ''
+                        );
+                    array_push($returnJSON['SMS']['data']['messagesByNumber'][$contactNumber]['messages'], $msgJSON);
                     
                     $messages = $xpath->query('div//div[contains(@class, "gc-message-sms-row")]', $conversation);
                     for ($miter = 0; $miter < $messages->length; $miter++) {// ($messages as $message) {
