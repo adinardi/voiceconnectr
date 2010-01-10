@@ -40,6 +40,7 @@ thetr.connectr.Base.prototype.init = function() {
     this.contentElem = goog.dom.createDom('div');
     goog.style.setSize(this.contentElem, 320, 465);
     this.contentElem.style.overflow = 'hidden';
+    this.contentElem.style.clear = 'both';
     
     goog.dom.appendChild(document.body, this.contentElem);
     
@@ -81,4 +82,8 @@ thetr.connectr.Base.prototype.handleTouchMove = function(e) {
     var curY = e.getBrowserEvent().targetTouches[0].pageY;
     this.contentElem.scrollTop = this.contentElem.scrollTop - (curY - this.touchStartY);
     this.touchStartY = curY;
+};
+
+thetr.connectr.Base.prototype.scrollTo = function(pos) {
+    this.contentElem.scrollTop = pos;
 };

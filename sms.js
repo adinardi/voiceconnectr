@@ -61,17 +61,9 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
         goog.dom.setTextContent(contactNameElem, meta.contactName);
         goog.dom.appendChild(convoElem, contactNameElem);
         
-        var fakeEntryElem = goog.dom.createDom('div', 'sms-reply-btn');
-        fakeEntryElem.phoneNumber = number;
-        fakeEntryElem.contactName = meta.contactName;
-        goog.dom.setTextContent(fakeEntryElem, 'Reply');
-        goog.events.listen(fakeEntryElem, 'click', this.handleEntryTouch, undefined, this);
-        
-        var fakeEntryContainerElem = goog.dom.createDom('div');
-        goog.dom.appendChild(fakeEntryContainerElem, fakeEntryElem);
-        goog.dom.appendChild(convoElem, fakeEntryContainerElem);
-        
-        for (var miter = conversation.length - 1; miter >= 0; miter--) {
+        // for (var miter = conversation.length - 1; miter >= 0; miter--) {
+        var miterMax = conversation.length;
+        for (var miter = 0; miter < miterMax; miter++) {
             var msg = conversation[miter];
 
             var msgContainer = goog.dom.createDom('div');
@@ -99,21 +91,38 @@ thetr.connectr.ui.sms.Main.prototype.renderConversationUI = function(number) {
             goog.dom.appendChild(convoElem, msgContainer);
         }
         
-
+        var fakeEntryElem = goog.dom.createDom('div', 'sms-reply-btn');
+        fakeEntryElem.phoneNumber = number;
+        fakeEntryElem.contactName = meta.contactName;
+        goog.dom.setTextContent(fakeEntryElem, 'Reply');
+        goog.events.listen(fakeEntryElem, 'click', this.handleEntryTouch, undefined, this);
+        
+        var fakeEntryContainerElem = goog.dom.createDom('div');
+        goog.dom.appendChild(fakeEntryContainerElem, fakeEntryElem);
+        goog.dom.appendChild(convoElem, fakeEntryContainerElem);
         
         goog.dom.appendChild(smsElem, convoElem);
     // }
     
-    var backElem = goog.dom.createDom('div');
+    var topElem = goog.dom.createDom('div');
+    var backElem = goog.dom.createDom('div', 'top-btn');
     goog.dom.setTextContent(backElem, '< Back');
-    // goog.dom.appendChild(smsElem, backElem);
-    this.baseController.setTopBar(backElem);
+    goog.dom.appendChild(topElem, backElem);
+    var replyElem = goog.dom.createDom('div', 'top-btn');
+    goog.dom.setTextContent(replyElem, 'Reply >');
+    replyElem.phoneNumber = number;
+    replyElem.contactName = meta.contactName;
+    goog.dom.appendChild(topElem, replyElem);
+    
+    this.baseController.setTopBar(topElem);
     goog.events.listen(backElem, 'click', this.handleBackFromContactClick, undefined, this);
+    goog.events.listen(replyElem, 'click', this.handleEntryTouch, undefined, this);
     
     // this.baseController.showRefreshButton(false);
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, smsElem);
     window.scrollTo(0,1);
+    this.baseController.scrollTo(999999);
 };
 
 thetr.connectr.ui.sms.Main.prototype.handleBackFromContactClick = function(e) {
@@ -128,15 +137,7 @@ thetr.connectr.ui.sms.Main.prototype.handleEntryTouch = function(e) {
 
 thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber, contactName) {
     var entryElem = goog.dom.createDom('div');
-    
-    var backBtnWrapper = goog.dom.createDom('div', 'btn-wrapper');
-    var backBtn = goog.dom.createDom('span', 'back-btn');
-    backBtn.phoneNumber = phoneNumber;
-    goog.events.listen(backBtn, 'click', this.handleBackFromEntry, undefined, this);
-    goog.dom.setTextContent(backBtn, '< Back');
-    
-    goog.dom.appendChild(backBtnWrapper, backBtn);
-    
+
     var numberElem = goog.dom.createDom('div', 'sms-phone-number');
     var displayNumber = this.dataCache[phoneNumber].meta.displayNumber;
     goog.dom.setTextContent(numberElem, contactName + ' [' + displayNumber + ']');
@@ -149,15 +150,18 @@ thetr.connectr.ui.sms.Main.prototype.showSMSEntry = function(phoneNumber, contac
     this.smsInputElem = inputElem;
     goog.dom.setTextContent(sendElem, 'Send Message');
     goog.dom.appendChild(sendBtnWrapper, sendElem);
-    // 
-    goog.dom.appendChild(entryElem, backBtnWrapper);
+
     goog.dom.appendChild(entryElem, numberElem);
     goog.dom.appendChild(entryElem, inputElem);
     goog.dom.appendChild(entryElem, sendBtnWrapper);
-    // 
-    // d.setVisible(true);
+
+    var backElem = goog.dom.createDom('div', 'top-btn');
+    backElem.phoneNumber = phoneNumber;
+    goog.dom.setTextContent(backElem, '< Back');
+    goog.events.listen(backElem, 'click', this.handleBackFromEntry, undefined, this);
     
-    this.baseController.showRefreshButton(false);
+    this.baseController.setTopBar(backElem);
+
     goog.dom.removeChildren(this.baseElem);
     goog.dom.appendChild(this.baseElem, entryElem);
     inputElem.focus();
