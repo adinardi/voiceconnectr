@@ -121,7 +121,8 @@ class gvClient {
                 
                 $convo = array();
 
-                for ($citer = 0; $citer < $conversations->length; $citer++) {//$conversations as $conversation) {
+                // for ($citer = 0; $citer < $conversations->length; $citer++) {//$conversations as $conversation) {
+                for ($citer = $conversations->length - 1; $citer >= 0; $citer--) {
                     $conversation = $conversations->item($citer);
                     // echo $entry->textContent . '<br>';
                     // echo $conversation->textContent;
