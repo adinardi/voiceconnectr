@@ -1,0 +1,5 @@
+This is a basic Google Voice web client designed for the Mobile Safari web browser.
+
+This made more sense before Google released the optimized iPhone web client. It only does SMS too.
+
+VoiceConnectr required Google's Closure JS library to exist at closure-library-read-only in the main directory.
